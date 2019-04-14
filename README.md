@@ -101,7 +101,7 @@ is necessary. \
 the goal is. It is possible that a detour that requires going out of the map is
 required for solving the task. Starting with a large map, or adjusting the size
 dynamically can fix this. \
-<img src="vis/0557.gif" height=180> <img src="vis/0557_d.gif" height=180> <img src="vis/0557.png" height=180> \
+<img src="vis/0557.gif" height=170> <img src="vis/0557_d.gif" height=170> <img src="vis/0557.png" height=170>
 
 ### Usage
 Version on the leaderboard is with the following agent invocation.
