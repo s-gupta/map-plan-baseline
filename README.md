@@ -34,11 +34,11 @@ motion [[5](#references)]. Thus, in our implementation, we initialize the agent
 to be at the center of the map it is building, and maintain the agent's pose by
 simply forward propagating these known dynamics. 
 
-Use of such almost everywhere deterministic dynamics also collapse the third
+Use of these almost everywhere deterministic dynamics also collapse the third
 unknown degree of freedom in the location of the goal, and the goal location
 can be recovered in a consistent global frame fixed at the agent's starting
 location. This makes the sensor suite *as strong as* the one used in our
-previous work [[1,2](#references)]. 
+own previous work [[1,2](#references)]. 
 
 ##### Map Construction
 Depth images can be back-projected using the known camera matrix, to yield 3D
@@ -61,7 +61,8 @@ actuation and environmental changes [[7](#references)].
 This basic implementation already achieves an SPL of *0.73* on the validation
 set provided for the challenge. We visualized the error modes on the validation
 set and made simple modifications to fix them. This boosted the SPL to *0.92*
-on the validation set, and success rate to *0.98*. The two most significant
+on the validation set, and success rate to *0.976*. A number of these fixes
+pertain to artifacts of the simulator. The two most significant conceptual
 fixes were the following, other details can be found in the code:
 1. Collision recovery behavior: Camera in habitat looks directly straight
 ahead, and has a focal length of 90 degrees. This causes obstacles within the
@@ -69,15 +70,58 @@ immediate 1.25m in front of the object to not be visible, leading to collisions.
 We detect such collisions (by using the goal vector at successive steps), and
 implement a recovery behaviour (turn around and walk back 1.25m), and replan.
 2. Our path planner as implemented in [[7](#references)], is not perfect and
-occasionally thrashes (outputs an action sequence of `LRLRLR`). We detect this
+occasionally thrashes (outputs an action sequence of `LRLRLR...`). We detect this
 thrashing and instead of outputting a single action from the best sequence,
-output multiple actions before replanning.
+output the entire action sequence before replanning.
 
 ### Visualizations
 We visualize built maps and executed paths for some sample success cases. We
 then show current failure modes. Visualizations are from the Habitat Gibson
 validation set. 
-<img src="vis/0557.png" height=200>
+#### Successful Navigations
+We show some top views of the maps that get built, and the trajectories that
+the agent takes to achieve the goal. 
+<img src="vis/0530.png" height=270>
+<img src="vis/0041.png" height=270>
+<img src="vis/0550.png" height=270>
+
+#### Current Error Modes
+Of the 24 remaining unsolved episodes on the validation set, here are some
+error modes. We show the first person RGB and depth image streams, top-view
+obstacle map, top-view dilated obstacle map overlaid with geodesic distance to
+goal, and the action sequence executed.
+1. Getting stuck at corners. It is likely that this particular error is because of
+a) the way missing parts of the mesh are treated in the simulator, or b) exact
+thresholds used for determining obstacle or not. However, further investigation
+is necessary. \
+<img src="vis/0720.gif" height=180> <img src="vis/0720_d.gif" height=180> <img src="vis/0720.png" height=180>
+<img src="vis/0586.gif" height=180> <img src="vis/0586_d.gif" height=180> <img src="vis/0586.png" height=180>
+<img src="vis/0811.gif" height=180> <img src="vis/0811_d.gif" height=180> <img src="vis/0811.png" height=180>
+2. Building too small a map. We initialize a fixed size map based on how far
+the goal is. It is possible that a detour that requires going out of the map is
+required for solving the task. Starting with a large map, or adjusting the size
+dynamically can fix this.
+<img src="vis/0557.gif" height=180> <img src="vis/0557_d.gif" height=180> <img src="vis/0557.png" height=180>
+
+### Citing
+If you find this code useful please consider citing the following papers.
+Mapping utilities are derived from code from the CVPR / IJCV paper, while the
+planner is derived from code for our NeurIPS paper.
+```
+@inproceedings{gupta2017cognitive,
+  author = "Gupta, Saurabh and Davidson, James and Levine, Sergey and Sukthankar, Rahul and Malik, Jitendra",
+  title = "Cognitive mapping and planning for visual navigation",
+  booktitle = "Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition",
+  year = "2017"
+}
+
+@inproceedings{kumar2018visual,
+  author = "Kumar, Ashish and Gupta, Saurabh and Fouhey, David and Levine, Sergey and Malik, Jitendra",
+  title = "Visual Memory for Robust Path Following",
+  booktitle = "Advances in Neural Information Processing Systems",
+  year = "2018"
+}
+```
 
 ### References
 1. [Cognitive Mapping and Planning for Visual
