@@ -22,7 +22,7 @@ construction](#map-construction) by stitching together successive depth maps
 into an occupancy maps, and [path planning](#path-planning) to compute actions
 to convey the agent to the desired target location.
 
-#### Pose Estimation
+##### Pose Estimation
 Dynamics in Habitat are *almost everywhere* deterministic [[4](#references)].
 Forward action always leads the agent to a location *25cm* in front of agent's
 current location. Left action deterministically rotates the agent exactly by
@@ -40,13 +40,13 @@ can be recovered in a consistent global frame fixed at the agent's starting
 location. This makes the sensor suite *as strong as* the one used in our
 previous work [[1,2](#references)]. 
 
-#### Map Construction
+##### Map Construction
 Depth images can be back-projected using the known camera matrix, to yield 3D
 points in the world. Points from depth images at different time steps can be
 brought into a common coordinate frame using the pose estimate for the robot at
 every time step.
 
-#### Path Planning
+##### Path Planning
 Given the built occupancy map, and the location of the goal in the coordinate
 frame of the map, we employ classical path planning to output the action that
 the agent should take. We compute the geodesic distance to the goal from all
@@ -54,8 +54,24 @@ locations on the map using fast-marching [[6](#references)]. We then simulate
 action sequences: `F`, `LF`, `RF`, `LLF`, `RRF`, and so on, to compute which
 one of them leads to the largest reduction in the geodesic distance. We then
 pick the first action from the best action sequence. We developed this planner
-for computing supervision for our paper of robust path following
-[[7](#references)]. 
+for computing supervision for our paper on robust path following under noise
+actuation and environmental changes [[7](#references)]. 
+
+### Results
+This basic implementation already achieves an SPL of *0.73* on the validation
+set provided for the challenge. We visualized the error modes on the validation
+set and made simple modifications to fix them. This boosted the SPL to *0.92*
+on the validation set, and success rate to *0.98*. The two most significant
+fixes were the following, other details can be found in the code:
+1. Collision recovery behavior: Camera in habitat looks directly straight
+ahead, and has a focal length of 90 degrees. This causes obstacles within the
+immediate 1.25m in front of the object to not be visible, leading to collisions.
+We detect such collisions (by using the goal vector at successive steps), and
+implement a recovery behaviour (turn around and walk back 1.25m), and replan.
+2. Our path planner as implemented in [[7](#references)], is not perfect and
+occasionally thrashes (outputs an action sequence of `LRLRLR`). We detect this
+thrashing and instead of outputting a single action from the best sequence,
+output multiple actions before replanning.
 
 ### Visualizations
 We visualize built maps and executed paths for some sample success cases. We
@@ -88,6 +104,5 @@ these is the case.
 Fronts](https://math.berkeley.edu/~sethian/2006/Papers/sethian.fastmarching.pdf).
 PNAS 1996. J.A. Sethian. 
 7. [Visual Memory for Robust Path
-Following](http://saurabhg.web.illinois.edu/pdfs/kumar2018visual.pdf). NeurIPS
-2018. Ashish Kumar*, Saurabh Gupta*, David Fouhey, Sergey Levine, Jitendra
+Following](http://saurabhg.web.illinois.edu/pdfs/kumar2018visual.pdf). NeurIPS 2018. Ashish Kumar*, Saurabh Gupta*, David Fouhey, Sergey Levine, Jitendra
 Malik.
