@@ -94,14 +94,22 @@ goal, and the action sequence executed.
 a) the way missing parts of the mesh are treated in the simulator, or b) exact
 thresholds used for determining obstacle or not. However, further investigation
 is necessary. \
-<img src="vis/0720.gif" height=180> <img src="vis/0720_d.gif" height=180> <img src="vis/0720.png" height=180>
-<img src="vis/0586.gif" height=180> <img src="vis/0586_d.gif" height=180> <img src="vis/0586.png" height=180>
-<img src="vis/0811.gif" height=180> <img src="vis/0811_d.gif" height=180> <img src="vis/0811.png" height=180>
+<img src="vis/0720.gif" height=170> <img src="vis/0720_d.gif" height=170> <img src="vis/0720.png" height=170> \
+<img src="vis/0586.gif" height=170> <img src="vis/0586_d.gif" height=170> <img src="vis/0586.png" height=170> \
+<img src="vis/0811.gif" height=170> <img src="vis/0811_d.gif" height=170> <img src="vis/0811.png" height=170>
 2. Building too small a map. We initialize a fixed size map based on how far
 the goal is. It is possible that a detour that requires going out of the map is
 required for solving the task. Starting with a large map, or adjusting the size
-dynamically can fix this.
-<img src="vis/0557.gif" height=180> <img src="vis/0557_d.gif" height=180> <img src="vis/0557.png" height=180>
+dynamically can fix this. \
+<img src="vis/0557.gif" height=180> <img src="vis/0557_d.gif" height=180> <img src="vis/0557.png" height=180> \
+
+### Usage
+Version on the leaderboard is with the following agent invocation.
+```
+agent = DepthMapperAndPlanner(map_size_cm=1200, out_dir=None, mark_locs=True,
+  reset_if_drift=True, count=-1, close_small_openings=True,
+  recover_on_collision=True, fix_thrashing=True, goal_f=1.1, point_cnt=2)
+```
 
 ### Citing
 If you find this code useful please consider citing the following papers.
